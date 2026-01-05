@@ -15,7 +15,16 @@ import SwiftUI
 ///   - Header: The type of header data associated with items
 ///   - HeaderContent: The SwiftUI view type for rendering headers
 ///   - CellContent: The SwiftUI view type for rendering cells
-struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, CellContent: View>: View {
+public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, CellContent: View>: View {
+    
+    // MARK: - Constants
+    
+    /// Default width for headers when not explicitly measured
+    private static var defaultHeaderWidth: Int { 120 }
+    /// Vertical position of headers from the top edge
+    private static var headerYPosition: CGFloat { 20 }
+    /// Height of the header container area
+    private static var headerContainerHeight: CGFloat { 40 }
     
     /// Represents a cell in the scroll view with optional header information
     struct Cell<T: Identifiable, H>: Identifiable {
@@ -37,6 +46,8 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
     
     /// Internal state tracking all cells
     @State private var cells: [Cell<Item, Header>] = []
+    /// Cached array of cells that have headers, updated when cells change
+    @State private var cachedCellsWithHeaders: [Cell<Item, Header>] = []
     /// Scroll position state
     @State private var scrollPosition: ScrollPosition = .init(point: CGPoint(x: 0, y: 0))
     
@@ -55,7 +66,7 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
     ///   - headers: Dictionary mapping item IDs to header data
     ///   - headerBuilder: ViewBuilder to create header views
     ///   - cellBuilder: ViewBuilder to create cell views
-    init(
+    public init(
         items: [Item],
         headers: [Item.ID: Header],
         @ViewBuilder headerBuilder: @escaping (Header) -> HeaderContent,
@@ -72,16 +83,22 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
                 item: item,
                 position: offset,
                 header: headers[item.id],
-                width: 120,
+                width: Self.defaultHeaderWidth,
                 offset: 0
             )
         }
         _cells = State(initialValue: cells)
+        _cachedCellsWithHeaders = State(initialValue: cells.filter { $0.header != nil })
     }
     
     /// Returns only cells that have associated headers
     var cellsWithHeaders: [Cell<Item, Header>] {
-        cells.filter { $0.header != nil }
+        cachedCellsWithHeaders
+    }
+    
+    /// Updates the cached list of cells with headers
+    private func updateCachedCellsWithHeaders() {
+        cachedCellsWithHeaders = cells.filter { $0.header != nil }
     }
     
     /// Computes the sticky position and opacity for a header based on scroll position
@@ -130,6 +147,7 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
         }
         
         cells[index] = cell
+        updateCachedCellsWithHeaders()
     }
     
     /// Updates the width of a header when its geometry changes
@@ -139,6 +157,7 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
     func setWidth(for cellId: Item.ID, width: Int) {
         guard let index = cells.firstIndex(where: { $0.item.id == cellId }) else { return }
         cells[index].width = width
+        updateCachedCellsWithHeaders()
     }
     
     var body: some View {
@@ -152,11 +171,11 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
                             .onGeometryChange(for: CGSize.self, of: { $0.size }) { newValue in
                                 setWidth(for: cell.item.id, width: Int(newValue.width))
                             }
-                            .position(x: CGFloat(cell.offset), y: 20)
+                            .position(x: CGFloat(cell.offset), y: Self.headerYPosition)
                     }
                 }
             }
-            .frame(height: 40)
+            .frame(height: Self.headerContainerHeight)
             
             // Scrollable content
             ScrollView(.horizontal) {
@@ -172,6 +191,8 @@ struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: View, C
             .scrollPosition($scrollPosition)
         }
         .onAppear {
+            // Use a non-zero initial x position to trigger initial scroll/geometry calculations,
+            // ensuring header positions are computed correctly on first appearance.
             scrollPosition = .init(point: CGPoint(x: 1, y: 0))
         }
     }
