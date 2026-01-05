@@ -96,11 +96,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         cachedCellsWithHeaders
     }
     
-    /// Updates the cached list of cells with headers
-    private func updateCachedCellsWithHeaders() {
-        cachedCellsWithHeaders = cells.filter { $0.header != nil }
-    }
-    
     /// Computes the sticky position and opacity for a header based on scroll position
     /// - Parameters:
     ///   - cellId: The ID of the cell whose header position should be computed
@@ -147,7 +142,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         }
         
         cells[index] = cell
-        updateCachedCellsWithHeaders()
     }
     
     /// Updates the width of a header when its geometry changes
@@ -157,7 +151,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
     func setWidth(for cellId: Item.ID, width: Int) {
         guard let index = cells.firstIndex(where: { $0.item.id == cellId }) else { return }
         cells[index].width = width
-        updateCachedCellsWithHeaders()
     }
     
     var body: some View {
