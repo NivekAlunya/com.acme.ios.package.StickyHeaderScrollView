@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  Previews.swift
 //  StickyHeaderScrollView
 //
 //  Created by Kevin Launay on 08/01/2026.
