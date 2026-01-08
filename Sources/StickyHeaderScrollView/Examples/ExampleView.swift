@@ -35,58 +35,59 @@ public struct EcommerceExample: View {
         Product(id: "7", name: "Running Shoes", price: 120, image: "shoe", category: "Sports"),
         Product(id: "8", name: "Yoga Mat", price: 35, image: "mat", category: "Sports"),
     ]
-
+    
     let headers: [String: CategoryHeader] = [
         "1": CategoryHeader(name: "Electronics", color: .blue, icon: "bolt.fill"),
         "4": CategoryHeader(name: "Books", color: .orange, icon: "book.fill"),
         "7": CategoryHeader(name: "Sports", color: .green, icon: "figure.run"),
     ]
-
+    
+    public init() {
+        
+    }
+    
     public var body: some View {
-        NavigationView {
-            StickyHeaderScrollView(
-                items: products,
-                headers: headers
-            ) { header in
-                HStack(spacing: 8) {
-                    Image(systemName: header.icon)
-                    Text(header.name)
-                        .font(.headline)
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(header.color)
-                .cornerRadius(20)
-            } cellBuilder: { index, product in
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: product.image)
-                        .font(.system(size: 50))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(12)
-
-                    Text(product.name)
-                        .font(.headline)
-                        .lineLimit(2)
-
-                    Text("$\(Int(product.price))")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.blue)
-
-                    Text(product.category)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .frame(width: 180)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(16)
-                .shadow(radius: 2)
+        StickyHeaderScrollView(
+            items: products,
+            headers: headers
+        ) { header in
+            HStack(spacing: 8) {
+                Image(systemName: header.icon)
+                Text(header.name)
+                    .font(.headline)
             }
-            .navigationTitle("Shop")
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(header.color)
+            .cornerRadius(20)
+        } cellBuilder: { index, product in
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: product.image)
+                    .font(.system(size: 50))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
+                
+                Text(product.name)
+                    .font(.headline)
+                    .lineLimit(2)
+                
+                Text("$\(Int(product.price))")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.blue)
+                
+                Text(product.category)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(width: 180)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(radius: 2)
         }
     }
 }
@@ -115,7 +116,7 @@ public struct TimelineExample: View {
         TimelineEvent(id: "5", time: "2:00 PM", title: "Client Call", description: "Project update", isHeader: true),
         TimelineEvent(id: "6", time: "3:00 PM", title: "Development", description: "Sprint work", isHeader: false),
     ]
-
+    
     var headers: [String: TimeHeader] {
         var result: [String: TimeHeader] = [:]
         for event in events where event.isHeader {
@@ -126,50 +127,51 @@ public struct TimelineExample: View {
         }
         return result
     }
-
+    
+    public init() {
+        
+    }
+    
     public var body: some View {
-        NavigationView {
-            StickyHeaderScrollView(
-                items: events,
-                headers: headers
-            ) { header in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(header.time)
+        StickyHeaderScrollView(
+            items: events,
+            headers: headers
+        ) { header in
+            VStack(alignment: .leading, spacing: 2) {
+                Text(header.time)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                Text(header.period)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.purple.opacity(0.2))
+            .cornerRadius(8)
+        } cellBuilder: { index, event in
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(event.isHeader ? Color.purple : Color.gray)
+                    .frame(width: 8, height: 8)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(event.time)
                         .font(.caption)
-                        .fontWeight(.semibold)
-                    Text(header.period)
-                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text(event.title)
+                        .font(.headline)
+                    Text(event.description)
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.purple.opacity(0.2))
-                .cornerRadius(8)
-            } cellBuilder: { index, event in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(event.isHeader ? Color.purple : Color.gray)
-                        .frame(width: 8, height: 8)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(event.time)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(event.title)
-                            .font(.headline)
-                        Text(event.description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(width: 220)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 1)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .navigationTitle("Today's Schedule")
+            .frame(width: 220)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 1)
         }
     }
 }
@@ -198,40 +200,43 @@ public struct PhotoGalleryExample: View {
         Photo(id: "7", imageName: "photo.fill", date: "Dec 8, 2025"),
         Photo(id: "8", imageName: "photo.fill", date: "Dec 8, 2025"),
     ]
-
+    
     let headers: [String: DateHeader] = [
         "1": DateHeader(date: "Dec 10, 2025", photoCount: 3),
         "4": DateHeader(date: "Dec 9, 2025", photoCount: 2),
         "6": DateHeader(date: "Dec 8, 2025", photoCount: 3),
     ]
-
+    
+    
+    public init() {
+        
+    }
+    
+    
     public var body: some View {
-        NavigationView {
-            StickyHeaderScrollView(
-                items: photos,
-                headers: headers
-            ) { header in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(header.date)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text("\(header.photoCount) photos")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial)
-                .cornerRadius(10)
-            } cellBuilder: { index, photo in
-                Image(systemName: photo.imageName)
-                    .font(.system(size: 60))
-                    .foregroundColor(.blue)
-                    .frame(width: 150, height: 150)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
+        StickyHeaderScrollView(
+            items: photos,
+            headers: headers
+        ) { header in
+            VStack(alignment: .leading, spacing: 2) {
+                Text(header.date)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text("\(header.photoCount) photos")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
             }
-            .navigationTitle("Photos")
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.ultraThinMaterial)
+            .cornerRadius(10)
+        } cellBuilder: { index, photo in
+            Image(systemName: photo.imageName)
+                .font(.system(size: 60))
+                .foregroundColor(.blue)
+                .frame(width: 150, height: 150)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
         }
     }
 }
