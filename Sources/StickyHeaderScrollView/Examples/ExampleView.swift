@@ -24,7 +24,7 @@ struct CategoryHeader {
     let icon: String
 }
 
-struct EcommerceExample: View {
+public struct EcommerceExample: View {
     let products = [
         Product(id: "1", name: "iPhone 15 Pro", price: 999, image: "iphone", category: "Electronics"),
         Product(id: "2", name: "AirPods Pro", price: 249, image: "airpods", category: "Electronics"),
@@ -42,7 +42,7 @@ struct EcommerceExample: View {
         "7": CategoryHeader(name: "Sports", color: .green, icon: "figure.run"),
     ]
 
-    var body: some View {
+    public var body: some View {
         NavigationView {
             StickyHeaderScrollView(
                 items: products,
@@ -106,7 +106,7 @@ struct TimeHeader {
     let period: String
 }
 
-struct TimelineExample: View {
+public struct TimelineExample: View {
     let events = [
         TimelineEvent(id: "1", time: "9:00 AM", title: "Team Standup", description: "Daily sync", isHeader: true),
         TimelineEvent(id: "2", time: "9:30 AM", title: "Code Review", description: "PR #234", isHeader: false),
@@ -127,7 +127,7 @@ struct TimelineExample: View {
         return result
     }
 
-    var body: some View {
+    public var body: some View {
         NavigationView {
             StickyHeaderScrollView(
                 items: events,
@@ -187,7 +187,7 @@ struct DateHeader {
     let photoCount: Int
 }
 
-struct PhotoGalleryExample: View {
+public struct PhotoGalleryExample: View {
     let photos = [
         Photo(id: "1", imageName: "photo.fill", date: "Dec 10, 2025"),
         Photo(id: "2", imageName: "photo.fill", date: "Dec 10, 2025"),
@@ -205,7 +205,7 @@ struct PhotoGalleryExample: View {
         "6": DateHeader(date: "Dec 8, 2025", photoCount: 3),
     ]
 
-    var body: some View {
+    public var body: some View {
         NavigationView {
             StickyHeaderScrollView(
                 items: photos,
