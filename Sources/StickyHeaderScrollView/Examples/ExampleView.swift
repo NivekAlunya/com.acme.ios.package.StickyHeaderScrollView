@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import StickyHeaderScrollView
 
 // MARK: - Example 1: E-commerce Product Categories
 
