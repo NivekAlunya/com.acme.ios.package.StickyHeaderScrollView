@@ -47,9 +47,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         /// The actual data item to display
         let item: T
         
-        /// Position index in the scroll view (0-based)
-        var position: Int
-        
         /// Optional header data for this cell
         var header: H?
         
@@ -70,9 +67,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
     
     /// Internal state tracking all cells with their positioning data
     @State private var cells: [Cell<Item, Header>] = []
-    
-    /// Size of the scroll view container
-    @State private var scrollViewSize: CGSize = .zero
     
     // MARK: - Configuration Properties
     
@@ -112,10 +106,9 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         self.cellBuilder = cellBuilder
         
         // Initialize cells with their header data and default positioning
-        let cells: [Cell<Item, Header>] = items.enumerated().map { (offset, item) in
+        let cells: [Cell<Item, Header>] = items.map { item in
             Cell(
                 item: item,
-                position: offset,
                 header: headers[item.id],
                 width: 120, // Default width, will be updated dynamically
                 xPosition: 0
@@ -158,10 +151,9 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
     /// 2. When the next header approaches, it pushes the current header to the left
     /// 3. Headers fade out as they're pushed off the left edge
     func computeStickyPositions() {
-        // Get all cells with headers, maintaining their order
-        let headersWithIndex = cellsWithHeaders.enumerated().map { ($0.offset, $0.element) }
+        let headersList = cellsWithHeaders
         
-        for (headerIndex, cell) in headersWithIndex {
+        for (headerIndex, cell) in headersList.enumerated() {
             guard let cellIndex = cells.firstIndex(where: { $0.item.id == cell.item.id }) else { continue }
             
             let cellX = cells[cellIndex].xPosition
@@ -172,8 +164,8 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
             var stickyX = max(0, cellX)
             
             // Collision detection: check if the next header is pushing this one
-            if headerIndex + 1 < headersWithIndex.count {
-                let nextCell = headersWithIndex[headerIndex + 1].1
+            if headerIndex + 1 < headersList.count {
+                let nextCell = headersList[headerIndex + 1]
                 let nextCellX = nextCell.xPosition
                 
                 // Calculate where the next header will be positioned
@@ -232,7 +224,7 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         // Scrollable content layer
         ScrollView(.horizontal, showsIndicators: true) {
             HStack(spacing: 0) {
-                ForEach(items.enumerated().map({ ($0.offset, $0.element) }), id: \.1.id) { offset, item in
+                ForEach(Array(items.enumerated()), id: \.element.id) { offset, item in
                     cellBuilder(offset, item)
                         // Track cell position as it scrolls
                         .onGeometryChange(for: CGRect.self, of: { $0.frame(in: .named("scrollSpace")) }) { frame in
@@ -243,9 +235,6 @@ public struct StickyHeaderScrollView<Item: Identifiable, Header, HeaderContent: 
         }
         .padding(.top, headerHeight) // Reserve space at top for sticky headers
         .coordinateSpace(name: "scrollSpace") // Named coordinate space for consistent positioning
-        .onGeometryChange(for: CGSize.self, of: { $0.size }) { size in
-            scrollViewSize = size
-        }
         // Sticky headers overlay layer
         // Headers are positioned absolutely and overlay the scroll view
         .overlay(alignment: .topLeading) {
